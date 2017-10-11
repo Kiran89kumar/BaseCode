@@ -1,0 +1,61 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
+
+android {
+
+    def globals = rootProject.extensions.getByName("ext")
+    compileSdkVersion globals.getAt("androidCompileSdkVersion")
+    buildToolsVersion globals.getAt("androidBuildToolsVersion")
+    def verName = globals.getAt("androidVersionName")
+
+    defaultConfig {
+
+        resConfigs "en"
+        vectorDrawables.useSupportLibrary = true
+        applicationId globals.getAt("androidApplicationId")
+        minSdkVersion globals.getAt("androidMinSdkVersion")
+        targetSdkVersion globals.getAt("androidTargetSdkVersion")
+        versionCode 1
+        versionName verName
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    def libs = rootProject.ext.libs
+    provided libs.javaxAnnotation
+    apt libs.daggerCompiler
+
+    compile libs.supportv13
+    compile libs.supportv4
+    compile libs.appcompatv7
+    compile libs.constraintLayout
+    compile(libs.design) {
+        exclude group: 'com.android.support', module: 'recyclerview-v7'
+    }
+
+    compile libs.rxJava
+    compile (libs.rxAndroid) {
+        exclude group: 'io.reactivex', module: 'rxjava'
+    }
+    compile(libs.retrofitRxJavaAdapter) {
+        exclude group: 'io.reactivex', module: 'rxjava'
+        exclude group: 'com.squareup.retrofit2', module: 'retrofit'
+    }
+
+    compile libs.dagger
+    compile libs.retrofit
+
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
+    testCompile 'junit:junit:4.12'
+}
